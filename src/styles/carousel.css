@@ -1,0 +1,47 @@
+.carousel-item {
+  transition: transform .6s ease-in-out;
+}
+
+.carousel-caption {
+  background: linear-gradient(transparent, rgba(0,0,0,0.8));
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20px;
+  text-align: left;
+}
+
+.carousel-indicators {
+  margin-bottom: 1rem;
+}
+
+.carousel-indicators button {
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50%;
+  margin: 0 5px !important;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  width: 5%;
+  opacity: 0.7;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  opacity: 1;
+}
+
+.carousel-item a {
+  text-decoration: none;
+  color: white;
+}
+
+.carousel-item img {
+  transition: transform 0.3s ease;
+}
+
+.carousel-item:hover img {
+  transform: scale(1.02);
+} 
