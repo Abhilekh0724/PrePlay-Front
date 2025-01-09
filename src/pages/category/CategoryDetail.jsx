@@ -355,7 +355,7 @@ const CategoryDetail = () => {
                       />
                       <div>
                         <h5 style={{ margin: 0, color: '#fff' }}>
-                          {review.user?.name || 'Anonymous User'}
+                          {review.userId?.firstName} {review.userId?.lastName}
                         </h5>
                         <small style={{ color: '#666' }}>
                           {new Date(review.createdAt).toLocaleDateString()}

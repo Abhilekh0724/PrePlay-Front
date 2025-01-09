@@ -22,6 +22,19 @@ const AdminPage = () => {
   });
   const [showAllCategories, setShowAllCategories] = useState(false);
 
+  const predefinedCategories = [
+    "Action",
+    "Horror",
+    "Adventure",
+    "Racing",
+    "Sports",
+    "Puzzle",
+    "Role-Playing",
+    "Strategy",
+    "Simulation",
+    "Casual"
+  ];
+
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -196,14 +209,18 @@ const AdminPage = () => {
             <div className="row">
               <div className="col-md-6 mb-3">
                 <label className="form-label">Category</label>
-                <input
-                  type="text"
+                <select
                   name="category"
                   value={formData.category}
                   onChange={handleInputChange}
-                  className="form-control bg-dark text-white"
+                  className="form-select bg-dark text-white"
                   required
-                />
+                >
+                  <option value="">Select Category</option>
+                  {predefinedCategories.map((cat, index) => (
+                    <option key={index} value={cat}>{cat}</option>
+                  ))}
+                </select>
               </div>
 
               {activeTab !== 'download' && (
@@ -407,5 +424,5 @@ const AdminPage = () => {
     </div>
   );
 };
-
-export default AdminPage; 
+  
+export default AdminPage;

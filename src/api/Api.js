@@ -67,9 +67,9 @@ export const deleteCategoryApi = (id) => Api.delete(`/api/admin/delete/${id}`);
 export const searchCategoriesApi = (query) => Api.get(`/api/admin/search?q=${query}`);
 
 // Review APIs
-export const postReviewApi = (reviewData) => Api.post("/api/review/create", reviewData);
+export const postReviewApi = (reviewData) => Api.post("/api/review", reviewData);
 export const getReviewsByCategoryApi = (categoryId) =>
-  Api.get(`/api/review/category/${categoryId}`);
+  Api.get(`/api/review/${categoryId}`);
 
 // Booking APIs
 export const createBookingApi = (bookingData) => Api.post("/api/book/book", bookingData);

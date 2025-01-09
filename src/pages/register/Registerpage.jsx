@@ -7,6 +7,99 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Logo from "../../components/Logo";
 
+const StarsBackground = React.memo(() => {
+  return (
+    <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: 0 }}>
+      {/* Glowing Stars */}
+      {[...Array(250)].map((_, i) => (
+        <div
+          key={`glow-${i}`}
+          style={{
+            position: "absolute",
+            width: "3.5px",
+            height: "3.5px",
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            borderRadius: "50%",
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            animation: `glow 3s ${Math.random()}s infinite alternate ease-in-out`,
+          }}
+        />
+      ))}
+
+      {/* Shooting Stars */}
+      {[...Array(10)].map((_, i) => (
+        <div
+          key={`shoot-${i}`}
+          style={{
+            position: "absolute",
+            width: "1px",
+            height: "80px",
+            background: `linear-gradient(to bottom, 
+              rgba(255, 255, 255, 0) 0%,
+              rgba(255, 255, 255, 1) 50%,
+              rgba(255, 255, 255, 0) 100%)`,
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            opacity: 0.7,
+            filter: "blur(0.5px)",
+            transform: `rotate(${45 + Math.random() * 15}deg)`,
+            animation: `shooting ${0.8 + Math.random() * 0.5}s ${Math.random() * 5}s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95)`,
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: "0",
+              left: "-1px",
+              width: "3px",
+              height: "3px",
+              backgroundColor: "rgba(255, 255, 255, 1)",
+              borderRadius: "50%",
+              boxShadow: "0 0 4px 2px rgba(255, 255, 255, 0.6)",
+            }}
+          />
+        </div>
+      ))}
+      <style>
+        {`
+          @keyframes glow {
+            0% {
+              transform: scale(0.8);
+              opacity: 1;
+            }
+            100% {
+              transform: scale(1.2);
+              opacity: 0.1;
+            }
+          }
+          @keyframes shooting {
+            0% {
+              transform: translateX(0) translateY(0) rotate(45deg) scale(1);
+              opacity: 0;
+            }
+            5% {
+              opacity: 0.3;
+            }
+            40% {
+              transform: translateX(-150px) translateY(150px) rotate(45deg) scale(1);
+              opacity: 0.7;
+            }
+            60% {
+              transform: translateX(-200px) translateY(200px) rotate(45deg) scale(0.8);
+              opacity: 0.4;
+            }
+            100% {
+              transform: translateX(-250px) translateY(250px) rotate(45deg) scale(0.5);
+              opacity: 0;
+            }
+          }
+        `}
+      </style>
+    </div>
+  );
+});
+
 const Registerpage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -59,23 +152,8 @@ const Registerpage = () => {
         overflow: "hidden",
       }}
     >
-      {/* Stars Background */}
-      <div className="stars-container">
-        {[...Array(15)].map((_, i) => (
-          <div
-            key={i}
-            className="star"
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 0.1}s`,
-              animationDuration: `${1 + Math.random() * 2}s`,
-              opacity: Math.random(),
-              transform: `scale(${0.5 + Math.random()}) rotate(${Math.random() * 360}deg)`,
-            }}
-          />
-        ))}
-      </div>
+      {/* Glowing Stars and Shooting Stars */}
+      <StarsBackground />
 
       {/* Register Form Container */}
       <div

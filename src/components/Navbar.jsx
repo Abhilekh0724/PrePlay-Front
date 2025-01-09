@@ -9,7 +9,6 @@ import {
   faBookmark,
   faStore,
   faChartLine,
-  faBell,
   faCog,
   faClipboardList,
   faGamepad,
@@ -54,10 +53,9 @@ const Navbar = () => {
   const showNavbar = location.pathname !== "/login" && location.pathname !== "/register";
 
   useEffect(() => {
-    // Initialize all dropdowns
     const dropdownElementList = document.querySelectorAll('.dropdown-toggle');
     const dropdownList = [...dropdownElementList].map(dropdownToggleEl => new Dropdown(dropdownToggleEl));
-    
+
     return () => {
       dropdownList.forEach(dropdown => dropdown?.dispose?.());
     };
@@ -74,7 +72,7 @@ const Navbar = () => {
 
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('userLogin', handleStorageChange);
-    
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('userLogin', handleStorageChange);
@@ -112,16 +110,15 @@ const Navbar = () => {
   };
 
   const renderDropdownMenu = () => {
-    const user = JSON.parse(localStorage.getItem("user"));
     if (!user) return null;
 
     return (
       <div className="dropdown">
-                  <button
+        <button
           className="btn dropdown-toggle"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
+          type="button"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
           style={{
             backgroundColor: "transparent",
             border: "none",
@@ -132,10 +129,10 @@ const Navbar = () => {
         >
           <FontAwesomeIcon icon={faUser} className="me-2" />
           {`${user.firstName} ${user.lastName}`}
-                  </button>
+        </button>
         <ul
           className="dropdown-menu dropdown-menu-end"
-          style={{ 
+          style={{
             backgroundColor: "#000",
             border: "1px solid #333"
           }}
@@ -148,8 +145,8 @@ const Navbar = () => {
               onMouseEnter={handleHoverEnter}
               onMouseLeave={handleHoverLeave}
             >
-                        <FontAwesomeIcon icon={faUser} className="me-2" />
-                        Profile
+              <FontAwesomeIcon icon={faUser} className="me-2" />
+              Profile
             </Link>
           </li>
 
@@ -177,9 +174,9 @@ const Navbar = () => {
                 >
                   <FontAwesomeIcon icon={faClipboardList} className="me-2" />
                   Admin Booked
-                      </Link>
-                    </li>
-                    <li>
+                </Link>
+              </li>
+              <li>
                 <Link 
                   className="dropdown-item" 
                   to="/admin-category" 
@@ -189,8 +186,8 @@ const Navbar = () => {
                 >
                   <FontAwesomeIcon icon={faGamepad} className="me-2" />
                   Admin Category
-                      </Link>
-                    </li>
+                </Link>
+              </li>
             </>
           )}
 
@@ -203,12 +200,12 @@ const Navbar = () => {
               onMouseEnter={handleHoverEnter}
               onMouseLeave={handleHoverLeave}
             >
-                        <FontAwesomeIcon icon={faSignOutAlt} className="me-2" />
-                        Logout
-                      </button>
-                    </li>
-                  </ul>
-                </div>
+              <FontAwesomeIcon icon={faSignOutAlt} className="me-2" />
+              Logout
+            </button>
+          </li>
+        </ul>
+      </div>
     );
   };
 
@@ -227,7 +224,7 @@ const Navbar = () => {
               style={{ padding: "0 20px", backgroundColor: bgColor }}>
               <Link to="/" className="navbar-brand" style={{ margin: 0 }}>
                 <Logo width="150px" />
-                  </Link>
+              </Link>
 
               <form className="d-flex" style={{ flex: 1, margin: "0 30px" }} onSubmit={handleSearch}>
                 <input
@@ -273,26 +270,6 @@ const Navbar = () => {
               <div className="d-flex align-items-center">
                 {user ? (
                   <>
-                    <button
-                      className="btn position-relative me-3"
-                      style={{
-                        backgroundColor: "transparent",
-                        border: "none",
-                        width: "40px",
-                        height: "40px",
-                        color: "#fff"
-                      }}
-                      onMouseEnter={handleHoverEnter}
-                      onMouseLeave={handleHoverLeave}
-                    >
-                      <FontAwesomeIcon icon={faBell} />
-                      <span
-                        className="position-absolute top-0 start-100 translate-middle badge rounded-pill"
-                        style={{ backgroundColor: "#333", color: "#fff" }}
-                      >
-                        3
-                      </span>
-                    </button>
                     {renderDropdownMenu()}
                   </>
                 ) : (
@@ -315,16 +292,18 @@ const Navbar = () => {
                   >
                     Sign In
                   </Link>
-              )}
+                )}
+              </div>
             </div>
-          </div>
-        </nav>
+          </nav>
 
           <div style={{ ...sidebarStyle, backgroundColor: bgColor }}>
             <ul className="nav flex-column" style={{ margin: 0, padding: "10px", borderTop: "none", backgroundColor: bgColor }}>
               {[
                 { to: "/", icon: faHome, text: "Home" },
                 { to: "/pre-book", icon: faBookmark, text: "Pre-Book" },
+                { to: "/store", icon: faStore, text: "Store" },
+                { to: "/charts", icon: faChartLine, text: "Top Charts" }
               ].map((item, index) => (
                 <li key={index}>
                   <Link
