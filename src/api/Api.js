@@ -79,6 +79,23 @@ export const getBookingsByUserApi = () => Api.get("/api/book/bookeduser");
 export const cancelBookingApi = (bookingId) => Api.patch(`/api/book/cancel/${bookingId}`);
 export const deleteBookingApi = (bookingId) => Api.delete(`/api/book/delete/${bookingId}`);
 export const getAllBookingsApi = () => Api.get("/api/book/all");
+// Product APIs
+export const createProductApi = (formData) =>
+  Api.post("/api/product", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+export const getAllProductsApi = () => Api.get("/api/product");
+export const getProductByIdApi = (id) => Api.get(`/api/product/${id}`);
+export const updateProductApi = (id, formData) =>
+  Api.put(`/api/product/${id}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+export const deleteProductApi = (id) => Api.delete(`/api/product/${id}`);
+
 
 // Payment APIs
 export const createPaymentApi = (paymentData) => Api.post("/api/payment/place", paymentData);

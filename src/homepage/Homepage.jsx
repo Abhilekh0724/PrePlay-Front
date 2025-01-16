@@ -1,49 +1,49 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getCategoriesApi } from "../api/Api";
+import { getAllProductsApi } from "../api/Api"; // Updated to fetch products
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { BASE_URL } from "../api/Api";
 
 const Homepage = () => {
-  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchProducts = async () => {
       try {
-        const response = await getCategoriesApi();
+        const response = await getAllProductsApi();
         if (response.data.success) {
-          // Sort categories by rating in descending order
-          const sortedCategories = response.data.categories
-            .sort((a, b) => b.rating - a.rating)
-            .slice(0, 5); // Get top 5 rated categories
-          setCategories(sortedCategories);
+          // Sort products by rating or any other logic
+          const sortedProducts = response.data.data
+            .sort((a, b) => b.rating - a.rating) // Assuming products have a `rating` field
+            .slice(0, 5); // Get top 5 rated products
+          setProducts(sortedProducts);
         }
       } catch (error) {
-        console.error("Error fetching categories:", error);
+        console.error("Error fetching products:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCategories();
+    fetchProducts();
   }, []);
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % categories.length);
+    setCurrentSlide((prev) => (prev + 1) % products.length);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + categories.length) % categories.length);
+    setCurrentSlide((prev) => (prev - 1 + products.length) % products.length);
   };
 
   // Auto-advance carousel every 5 seconds
   useEffect(() => {
     const timer = setInterval(nextSlide, 5000);
     return () => clearInterval(timer);
-  }, [categories.length]);
+  }, [products.length]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -67,10 +67,10 @@ const Homepage = () => {
           overflow: "hidden",
         }}
       >
-        {categories.map((category, index) => (
-            <Link
-            key={category._id}
-              to={`/category/${category._id}`}
+        {products.map((product, index) => (
+          <Link
+            key={product._id}
+            to={`/product/${product._id}`} // Navigate to the product details page
             style={{
               position: "absolute",
               top: 0,
@@ -91,7 +91,7 @@ const Homepage = () => {
                 left: 0,
                 width: "100%",
                 height: "100%",
-                backgroundImage: `url(${BASE_URL}${category.photo})`,
+                backgroundImage: `url(${BASE_URL}${product.photo})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 filter: "blur(10px)",
@@ -109,10 +109,10 @@ const Homepage = () => {
                 gap: "30px",
               }}
             >
-              {/* Game Image */}
+              {/* Product Image */}
               <img
-                src={`${BASE_URL}${category.photo}`}
-                alt={category.name}
+                src={`${BASE_URL}${product.photo}`}
+                alt={product.name}
                 style={{
                   width: "300px",
                   height: "400px",
@@ -122,10 +122,10 @@ const Homepage = () => {
                 }}
               />
 
-              {/* Game Info */}
+              {/* Product Info */}
               <div>
                 <h1 style={{ fontSize: "48px", marginBottom: "20px" }}>
-                  {category.name}
+                  {product.name}
                 </h1>
                 <div
                   style={{
@@ -144,9 +144,9 @@ const Homepage = () => {
                     }}
                   >
                     <FontAwesomeIcon icon={faStar} />
-                    <span style={{ fontSize: "24px" }}>{category.rating}</span>
+                    <span style={{ fontSize: "24px" }}>{product.rating || "N/A"}</span>
                   </div>
-                  <span style={{ color: "#999" }}>{category.type}</span>
+                  <span style={{ color: "#999" }}>{product.type}</span>
                 </div>
                 <p
                   style={{
@@ -156,7 +156,7 @@ const Homepage = () => {
                     lineHeight: "1.6",
                   }}
                 >
-                  {category.description}
+                  {product.description}
                 </p>
               </div>
             </div>
@@ -221,7 +221,7 @@ const Homepage = () => {
             zIndex: 2,
           }}
         >
-          {categories.map((_, index) => (
+          {products.map((_, index) => (
             <button
               key={index}
               onClick={(e) => {
@@ -241,13 +241,13 @@ const Homepage = () => {
         </div>
       </div>
 
-      {/* Category Cards Section */}
+      {/* All Products Section */}
       <div style={{ padding: "40px" }}>
-        <h2 style={{ marginBottom: "30px" }}>All Games</h2>
+        <h2 style={{ marginBottom: "30px" }}>All Products</h2>
         <div className="row g-4">
-          {categories.map((category) => (
-            <div key={category._id} className="col-md-4 col-lg-3">
-              <Link to={`/category/${category._id}`} style={{ textDecoration: "none" }}>
+          {products.map((product) => (
+            <div key={product._id} className="col-md-4 col-lg-3">
+              <Link to={`/product/${product._id}`} style={{ textDecoration: "none" }}>
                 <div
                   style={{
                     backgroundColor: "#1a1a1a",
@@ -276,8 +276,8 @@ const Homepage = () => {
                     }}
                   >
                     <img
-                      src={`${BASE_URL}${category.photo}`}
-                      alt={category.name}
+                      src={`${BASE_URL}${product.photo}`}
+                      alt={product.name}
                       style={{
                         width: "100%",
                         height: "100%",
@@ -293,7 +293,7 @@ const Homepage = () => {
                         fontWeight: "bold",
                       }}
                     >
-                      {category.name}
+                      {product.name}
                     </h5>
                     <div
                       style={{
@@ -312,15 +312,15 @@ const Homepage = () => {
                         }}
                       >
                         <FontAwesomeIcon icon={faStar} />
-                        <span>{category.rating}</span>
+                        <span>{product.rating || "N/A"}</span>
                       </div>
                       <span style={{ color: "#999", fontSize: "14px" }}>
-                        {category.type}
+                        {product.type}
                       </span>
                     </div>
+                  </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
             </div>
           ))}
         </div>

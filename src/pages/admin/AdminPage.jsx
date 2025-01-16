@@ -1,85 +1,103 @@
 import React, { useState, useEffect } from 'react';
-import { createCategoryApi, getCategoriesApi, updateCategoryApi, deleteCategoryApi } from '../../api/Api';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import {
+  createProductApi,
+  getAllProductsApi,
+  updateProductApi,
+  deleteProductApi,
+} from '../../api/Api';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { BASE_URL } from '../../api/Api';
 import Logo from '../../components/Logo';
 
 const AdminPage = () => {
-  const [activeTab, setActiveTab] = useState('download'); // 'download', 'buy', 'prebook'
-  const [categories, setCategories] = useState([]);
+  const [activeTab, setActiveTab] = useState('download'); // Modes: 'download', 'buy', 'prebook'
+  const [products, setProducts] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    category: '',
-    type: 'PC', // 'PC' or 'Mobile'
+    category: [],
+    type: 'PC', // Options: 'PC', 'Mobile'
     price: '',
     releaseDate: '',
     photo: null,
     isGlobal: false,
-    mode: 'download' // 'download', 'buy', or 'prebook'
+    mode: 'download', // Options: 'download', 'buy', 'prebook'
   });
-  const [showAllCategories, setShowAllCategories] = useState(false);
+  const [showAllProducts, setShowAllProducts] = useState(false);
 
   const predefinedCategories = [
-    "Action",
-    "Horror",
-    "Adventure",
-    "Racing",
-    "Sports",
-    "Puzzle",
-    "Role-Playing",
-    "Strategy",
-    "Simulation",
-    "Casual"
+    'Action',
+    'Horror',
+    'Adventure',
+    'Racing',
+    'Sports',
+    'Puzzle',
+    'Role-Playing',
+    'Strategy',
+    'Simulation',
+    'Casual',
   ];
 
   useEffect(() => {
-    fetchCategories();
+    fetchProducts();
   }, []);
 
-  const fetchCategories = async () => {
+  const fetchProducts = async () => {
     try {
-      const response = await getCategoriesApi();
+      const response = await getAllProductsApi();
       if (response.data.success) {
-        setCategories(response.data.categories);
+        setProducts(response.data.data);
       }
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error('Error fetching products:', error);
     }
   };
 
   const handleInputChange = (e) => {
     const { name, value, type, files, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'file' ? files[0] : 
-              type === 'checkbox' ? checked : value
-    }));
+
+    if (name === 'category') {
+      const selectedCategories = Array.from(
+        e.target.selectedOptions,
+        (option) => option.value
+      );
+      setFormData((prev) => ({
+        ...prev,
+        category: selectedCategories,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === 'file' ? files[0] : type === 'checkbox' ? checked : value,
+      }));
+    }
   };
 
-  const handleEdit = (category) => {
-    setEditingId(category._id);
+  const handleEdit = (product) => {
+    setEditingId(product._id);
     setFormData({
-      name: category.name,
-      description: category.description,
-      category: category.category,
-      type: category.type,
-      price: category.price || '',
-      releaseDate: category.releaseDate ? new Date(category.releaseDate).toISOString().split('T')[0] : '',
-      isGlobal: category.isGlobal,
-      mode: category.mode
+      name: product.name,
+      description: product.description,
+      category: product.category, // Already an array
+      type: product.type,
+      price: product.price || '',
+      releaseDate: product.releaseDate
+        ? new Date(product.releaseDate).toISOString().split('T')[0]
+        : '',
+      isGlobal: product.isGlobal,
+      mode: product.mode,
     });
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this game?')) {
+    if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        await deleteCategoryApi(id);
-        fetchCategories();
+        await deleteProductApi(id);
+        fetchProducts();
       } catch (error) {
-        console.error("Error deleting category:", error);
+        console.error('Error deleting product:', error);
       }
     }
   };
@@ -87,86 +105,94 @@ const AdminPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formDataToSend = new FormData();
-    
-    Object.keys(formData).forEach(key => {
-      if (formData[key] !== null) {
+
+    Object.keys(formData).forEach((key) => {
+      if (
+        (formData.mode === 'download' && (key === 'price' || key === 'releaseDate')) ||
+        formData[key] === null
+      ) {
+        return;
+      }
+
+      if (key === 'category') {
+        formDataToSend.append(key, JSON.stringify(formData.category));
+      } else {
         formDataToSend.append(key, formData[key]);
       }
     });
 
     try {
       if (editingId) {
-        await updateCategoryApi(editingId, formDataToSend);
+        await updateProductApi(editingId, formDataToSend);
       } else {
-        await createCategoryApi(formDataToSend);
+        await createProductApi(formDataToSend);
       }
 
       setFormData({
         name: '',
         description: '',
-        category: '',
+        category: [],
         type: 'PC',
         price: '',
         releaseDate: '',
         photo: null,
         isGlobal: false,
-        mode: activeTab
+        mode: activeTab,
       });
       setEditingId(null);
-      fetchCategories();
+      fetchProducts();
     } catch (error) {
-      console.error("Error saving category:", error);
+      console.error('Error saving product:', error);
     }
   };
 
-  const filteredCategories = categories.filter(cat => cat.mode === activeTab);
+  const filteredProducts = products.filter((product) => product.mode === activeTab);
 
   return (
-    <div style={{
-      marginLeft: '260px',
-      marginTop: '70px',
-      padding: '40px',
-      backgroundColor: '#0a0a0a',
-      minHeight: 'calc(100vh - 70px)',
-      color: '#fff'
-    }}>
-      {/* Toggle View Button */}
+    <div
+      style={{
+        marginLeft: '260px',
+        marginTop: '70px',
+        padding: '40px',
+        backgroundColor: '#0a0a0a',
+        minHeight: 'calc(100vh - 70px)',
+        color: '#fff',
+      }}
+    >
       <div className="d-flex justify-content-between align-items-center mb-4">
         <Logo width="150px" />
         <button
-          className={`btn ${showAllCategories ? 'btn-success' : 'btn-outline-success'}`}
-          onClick={() => setShowAllCategories(!showAllCategories)}
+          className={`btn ${showAllProducts ? 'btn-success' : 'btn-outline-success'}`}
+          onClick={() => setShowAllProducts(!showAllProducts)}
         >
-          {showAllCategories ? 'Show Category Tabs' : 'Manage All Categories'}
+          {showAllProducts ? 'Show Product Tabs' : 'Manage All Products'}
         </button>
       </div>
 
-      {!showAllCategories ? (
+      {!showAllProducts ? (
         <>
-          {/* Tabs */}
           <div style={{ marginBottom: '30px' }}>
             <div className="btn-group" role="group">
-              {['download', 'buy', 'prebook'].map(tab => (
+              {['download', 'buy', 'prebook'].map((tab) => (
                 <button
                   key={tab}
                   className={`btn ${activeTab === tab ? 'btn-success' : 'btn-outline-success'}`}
                   onClick={() => {
                     setActiveTab(tab);
-                    setFormData(prev => ({ ...prev, mode: tab }));
+                    setFormData((prev) => ({ ...prev, mode: tab }));
                   }}
                 >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)} Games
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)} Products
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Add/Edit Game Form */}
           <form onSubmit={handleSubmit} className="mb-5">
-            <h3>{editingId ? 'Edit Game' : 'Add New Game'}</h3>
+            <h3>{editingId ? 'Edit Product' : 'Add New Product'}</h3>
             <div className="row">
               <div className="col-md-6 mb-3">
-                <label className="form-label">Game Name</label>
+                <label className="form-label">Product Name</label>
                 <input
                   type="text"
                   name="name"
@@ -180,12 +206,14 @@ const AdminPage = () => {
               <div className="col-md-6 mb-3">
                 <label className="form-label">Platform</label>
                 <div className="btn-group w-100">
-                  {['PC', 'Mobile'].map(platform => (
+                  {['PC', 'Mobile'].map((platform) => (
                     <button
                       key={platform}
                       type="button"
-                      className={`btn ${formData.type === platform ? 'btn-success' : 'btn-outline-success'}`}
-                      onClick={() => setFormData(prev => ({ ...prev, type: platform }))}
+                      className={`btn ${
+                        formData.type === platform ? 'btn-success' : 'btn-outline-success'
+                      }`}
+                      onClick={() => setFormData((prev) => ({ ...prev, type: platform }))}
                     >
                       {platform}
                     </button>
@@ -211,14 +239,16 @@ const AdminPage = () => {
                 <label className="form-label">Category</label>
                 <select
                   name="category"
+                  multiple
                   value={formData.category}
                   onChange={handleInputChange}
                   className="form-select bg-dark text-white"
                   required
                 >
-                  <option value="">Select Category</option>
                   {predefinedCategories.map((cat, index) => (
-                    <option key={index} value={cat}>{cat}</option>
+                    <option key={index} value={cat}>
+                      {cat}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -265,24 +295,24 @@ const AdminPage = () => {
 
             <div className="mt-3">
               <button type="submit" className="btn btn-success me-2">
-                {editingId ? 'Update Game' : 'Add Game'}
+                {editingId ? 'Update Product' : 'Add Product'}
               </button>
               {editingId && (
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="btn btn-secondary"
                   onClick={() => {
                     setEditingId(null);
                     setFormData({
                       name: '',
                       description: '',
-                      category: '',
+                      category: [],
                       type: 'PC',
                       price: '',
                       releaseDate: '',
                       photo: null,
                       isGlobal: false,
-                      mode: activeTab
+                      mode: activeTab,
                     });
                   }}
                 >
@@ -292,43 +322,43 @@ const AdminPage = () => {
             </div>
           </form>
 
-          {/* Games List */}
-          <h3>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Games</h3>
+          <h3>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Products</h3>
           <div className="row g-4">
-            {filteredCategories.map(category => (
-              <div key={category._id} className="col-md-4">
+            {filteredProducts.map((product) => (
+              <div key={product._id} className="col-md-4">
                 <div className="card bg-dark">
-                  <img 
-                    src={`${BASE_URL}${category.photo}`}
+                  <img
+                    src={`${BASE_URL}${product.photo}`}
                     className="card-img-top"
-                    alt={category.name}
+                    alt={product.name}
                     style={{ height: '200px', objectFit: 'cover' }}
                   />
                   <div className="card-body">
                     <div className="d-flex justify-content-between align-items-start">
-                      <h5 className="card-title">{category.name}</h5>
-                      <div className="badge bg-success">{category.type}</div>
+                      <h5 className="card-title">{product.name}</h5>
+                      <div className="badge bg-success">{product.type}</div>
                     </div>
-                    <p className="card-text">{category.description}</p>
+                    <p className="card-text">{product.description}</p>
                     <div className="d-flex justify-content-between align-items-center">
-                      {category.mode === 'buy' && (
-                        <div className="text-success">${category.price}</div>
+                      {product.mode === 'buy' && (
+                        <div className="text-success">${product.price}</div>
                       )}
-                      {category.mode === 'prebook' && (
+                      {product.mode === 'prebook' && (
                         <div className="text-info">
-                          {new Date(category.releaseDate).toLocaleDateString()}
+                          {new Date(product.releaseDate).toLocaleDateString()}
                         </div>
                       )}
+                      {product.mode === 'download' && <div>-</div>}
                       <div>
                         <button
                           className="btn btn-sm btn-warning me-2"
-                          onClick={() => handleEdit(category)}
+                          onClick={() => handleEdit(product)}
                         >
                           <FontAwesomeIcon icon={faEdit} />
                         </button>
                         <button
                           className="btn btn-sm btn-danger"
-                          onClick={() => handleDelete(category._id)}
+                          onClick={() => handleDelete(product._id)}
                         >
                           <FontAwesomeIcon icon={faTrash} />
                         </button>
@@ -342,9 +372,7 @@ const AdminPage = () => {
         </>
       ) : (
         <>
-          <h2 className="mb-4">Manage All Categories</h2>
-          
-          {/* Categories Table */}
+          <h2 className="mb-4">Manage All Products</h2>
           <div className="table-responsive">
             <table className="table table-dark table-hover">
               <thead>
@@ -360,56 +388,63 @@ const AdminPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {categories.map(category => (
-                  <tr key={category._id}>
+                {products.map((product) => (
+                  <tr key={product._id}>
                     <td>
-                      <img 
-                        src={`${BASE_URL}${category.photo}`}
-                        alt={category.name}
-                        style={{ 
-                          width: '50px', 
-                          height: '50px', 
+                      <img
+                        src={`${BASE_URL}${product.photo}`}
+                        alt={product.name}
+                        style={{
+                          width: '50px',
+                          height: '50px',
                           objectFit: 'cover',
-                          borderRadius: '4px'
+                          borderRadius: '4px',
                         }}
                       />
                     </td>
-                    <td>{category.name}</td>
-                    <td>{category.category}</td>
+                    <td>{product.name}</td>
+                    <td>{product.category.join(', ')}</td>
                     <td>
-                      <span className={`badge ${category.type === 'PC' ? 'bg-primary' : 'bg-success'}`}>
-                        {category.type}
+                      <span
+                        className={`badge ${
+                          product.type === 'PC' ? 'bg-primary' : 'bg-success'
+                        }`}
+                      >
+                        {product.type}
                       </span>
                     </td>
                     <td>
-                      <span className="badge bg-info">
-                        {category.mode}
-                      </span>
+                      <span className="badge bg-info">{product.mode}</span>
                     </td>
                     <td>
-                      {category.mode === 'buy' && `$${category.price}`}
-                      {category.mode === 'prebook' && new Date(category.releaseDate).toLocaleDateString()}
-                      {category.mode === 'download' && '-'}
+                      {product.mode === 'buy' && `$${product.price}`}
+                      {product.mode === 'prebook' &&
+                        new Date(product.releaseDate).toLocaleDateString()}
+                      {product.mode === 'download' && '-'}
                     </td>
                     <td>
-                      <span className={`badge ${category.isGlobal ? 'bg-success' : 'bg-secondary'}`}>
-                        {category.isGlobal ? 'Yes' : 'No'}
+                      <span
+                        className={`badge ${
+                          product.isGlobal ? 'bg-success' : 'bg-secondary'
+                        }`}
+                      >
+                        {product.isGlobal ? 'Yes' : 'No'}
                       </span>
                     </td>
                     <td>
                       <button
                         className="btn btn-sm btn-warning me-2"
                         onClick={() => {
-                          handleEdit(category);
-                          setShowAllCategories(false);
-                          setActiveTab(category.mode);
+                          handleEdit(product);
+                          setShowAllProducts(false);
+                          setActiveTab(product.mode);
                         }}
                       >
                         <FontAwesomeIcon icon={faEdit} />
                       </button>
                       <button
                         className="btn btn-sm btn-danger"
-                        onClick={() => handleDelete(category._id)}
+                        onClick={() => handleDelete(product._id)}
                       >
                         <FontAwesomeIcon icon={faTrash} />
                       </button>
@@ -424,5 +459,5 @@ const AdminPage = () => {
     </div>
   );
 };
-  
+
 export default AdminPage;

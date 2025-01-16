@@ -12,6 +12,7 @@ import {
   faCog,
   faClipboardList,
   faGamepad,
+  faShoppingCart,
 } from "@fortawesome/free-solid-svg-icons";
 import { Dropdown } from 'bootstrap';
 import Logo from './Logo';
@@ -301,7 +302,8 @@ const Navbar = () => {
             <ul className="nav flex-column" style={{ margin: 0, padding: "10px", borderTop: "none", backgroundColor: bgColor }}>
               {[
                 { to: "/", icon: faHome, text: "Home" },
-                { to: "/pre-book", icon: faBookmark, text: "Pre-Book" },
+                { to: "/prebook", icon: faBookmark, text: "Pre-Book" },
+                { to: "/buy", icon: faShoppingCart, text: "Buy" },
                 { to: "/store", icon: faStore, text: "Store" },
                 { to: "/charts", icon: faChartLine, text: "Top Charts" }
               ].map((item, index) => (

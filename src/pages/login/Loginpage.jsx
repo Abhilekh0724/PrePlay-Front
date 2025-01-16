@@ -112,7 +112,7 @@ const Loginpage = () => {
       if (response.data.success) {
         const { token, userData } = response.data;
 
-        // Check if the user is an admin
+        // Check if the user is an admin (for toast message only)
         if (userData.isAdmin) {
           toast.success("Welcome, Admin!");
         } else {
@@ -124,12 +124,8 @@ const Loginpage = () => {
         localStorage.setItem("user", JSON.stringify(userData));
         window.dispatchEvent(new Event("userLogin"));
 
-        // Redirect based on user type
-        if (userData.isAdmin) {
-          navigate("/admin-dashboard");
-        } else {
-          navigate("/");
-        }
+        // Always redirect to homepage
+        navigate("/");
       } else {
         toast.error(response.data.message);
       }

@@ -16,6 +16,9 @@ import AdminBooked from "./pages/admin/AdminBooked";
 import PaymentPage from "./pages/payment/Payment";
 import AdminPage from "./pages/admin/AdminPage";
 import TopCharts from "./pages/category/TopCharts";
+import BuyPage from "./pages/category/BuyPage";
+import Store from "./pages/category/Store";
+import PreBook from "./pages/category/PreBook";
 
 function App() {
   return (
@@ -37,6 +40,9 @@ function App() {
         <Route path="/book/adminbook" element={<AdminBooked />} />
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/charts" element={<TopCharts />} />
+        <Route path="/buy" element={<BuyPage />} />
+        <Route path="/store" element={<Store />} />
+        <Route path="/prebook" element={<PreBook />} />
       </Routes>
     </Router>
   );
